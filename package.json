@@ -1,0 +1,17 @@
+{
+  "name": "koha-plugin-patron-passport",
+  "description": "Koha Patron Passport plugin",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bywatersolutions/koha-plugin-patron-passport.git"
+  },
+  "author": "Kyle M Hall <kyle@bywatersolutions.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/bywatersolutions/koha-plugin-patron-passport/issues"
+  },
+  "homepage": "https://github.com/bywatersolutions/koha-plugin-patron-passport#readme"
+}
