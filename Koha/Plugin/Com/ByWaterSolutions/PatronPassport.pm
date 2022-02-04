@@ -127,7 +127,7 @@ sub patron_barcode_transform {
     };
 }
 
-sub install() {
+sub install {
     my ( $self, $args ) = @_;
 
     my $attribute_type = Koha::Patron::Attribute::Type->find('PASSPORTED');
@@ -147,7 +147,7 @@ sub upgrade {
     return 1;
 }
 
-sub uninstall() {
+sub uninstall {
     my ( $self, $args ) = @_;
     return 1;
 }
