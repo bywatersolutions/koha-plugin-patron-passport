@@ -1,12 +1,12 @@
 {
-  "/patron/check": {
+  "/patron/check/{patron_id}": {
     "get": {
       "x-mojo-to": "Com::ByWaterSolutions::EZProxy::ApiController#check",
       "operationId": "CheckPatron",
       "tags": ["opac", "patron"],
       "parameters": [
         {
-          "description": "Username",
+          "description": "cardnumber",
           "in": "query",
           "name": "user",
           "required": true,
@@ -21,7 +21,7 @@
         }
       ],
       "produces": [
-        "text/html"
+        "text/json"
       ],
       "responses": {
         "200": {
@@ -35,6 +35,11 @@
         },
         "500": {
           "description": "Internal server error"
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "1"
         }
       }
     }
