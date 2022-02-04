@@ -15,11 +15,13 @@
       - text/json
     responses:
       '200':
-        description: 'OK if auth success, ERROR if auth failure'
+        description: A patron
       '400':
         description: Bad request
       '403':
         description: Permission denied
+      '404':
+        description: Patron not found
       '500':
         description: Internal server error
     x-koha-authorization:
