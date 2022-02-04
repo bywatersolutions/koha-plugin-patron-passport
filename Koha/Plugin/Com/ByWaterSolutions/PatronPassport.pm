@@ -9,6 +9,7 @@ use base qw(Koha::Plugins::Base);
 use Cwd qw(abs_path);
 use Encode qw(decode);
 use File::Slurp qw(read_file);
+use YAML::XS;
 
 use Parallel::Loops;
 use LWP::UserAgent;
@@ -131,8 +132,8 @@ sub uninstall() {
 sub api_routes {
     my ( $self, $args ) = @_;
 
-    my $spec_str = $self->mbf_read('openapi.json');
-    my $spec     = decode_json($spec_str);
+    my $spec_str = $self->mbf_read('openapi.yaml');
+    my $spec     = Load($spec_str);
 
     return $spec;
 }

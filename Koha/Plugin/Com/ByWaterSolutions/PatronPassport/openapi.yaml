@@ -1,0 +1,28 @@
+---
+/patron/check/{cardnumber}:
+  get:
+    x-mojo-to: Com::ByWaterSolutions::PatronPassport::ApiController#check
+    operationId: CheckPatronPPP
+    tags:
+      - patron
+    parameters:
+      - description: Patron cardnumber
+        in: path
+        name: cardnumber
+        required: true
+        type: string
+    produces:
+      - text/json
+    responses:
+      '200':
+        description: 'OK if auth success, ERROR if auth failure'
+      '400':
+        description: Bad request
+      '403':
+        description: Permission denied
+      '500':
+        description: Internal server error
+    x-koha-authorization:
+      permissions:
+        borrowers: '1'
+

@@ -1,21 +1,14 @@
 {
-  "/patron/check/{patron_id}": {
+  "/patron/check/{cardnumber}": {
     "get": {
-      "x-mojo-to": "Com::ByWaterSolutions::EZProxy::ApiController#check",
-      "operationId": "CheckPatron",
+      "x-mojo-to": "Com::ByWaterSolutions::PatronPassport::ApiController#check",
+      "operationId": "CheckPatronPPP",
       "tags": ["opac", "patron"],
       "parameters": [
         {
-          "description": "cardnumber",
-          "in": "query",
-          "name": "user",
-          "required": true,
-          "type": "string"
-        },
-        {
-          "description": "Password",
-          "in": "query",
-          "name": "pass",
+          "description": "Patron cardnumber",
+          "in": "path",
+          "name": "cardnumber",
           "required": true,
           "type": "string"
         }
