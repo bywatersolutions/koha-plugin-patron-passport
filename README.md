@@ -16,8 +16,8 @@ This plugin requires data to be added to koha-conf.xml in the following format:
     <setting name="use_logged_in_branchcode" value="1"/> <!-- has precedence over default branchcode -->
 
     <servers>
-        <server name="ServerB" address="libB.libraries.org" username="koha" password="koha" />
-        <server name="ServerC" address="libC.libraries.org" username="koha" password="koha" />
+        <server name="ServerB" address="https://libB.libraries.org" username="koha" password="koha" />
+        <server name="ServerC" address="https://libC.libraries.org" username="koha" password="koha" />
     </servers>
  </patron_passport>
 ```
