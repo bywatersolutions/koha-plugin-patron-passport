@@ -11,9 +11,10 @@ use Encode qw(decode);
 use File::Slurp qw(read_file);
 use YAML::XS;
 
-use Parallel::Loops;
-use LWP::UserAgent;
 use HTTP::Request::Common;
+use LWP::UserAgent;
+use Parallel::Loops;
+use Try::Tiny;
 
 use C4::Auth;
 use C4::Context;
@@ -63,7 +64,6 @@ sub patron_barcode_transform {
 
     my $conf    = C4::Context->config('patron_passport');
     my $servers = $conf->{servers}->{server};
-    warn Data::Dumper::Dumper($servers);
 
     my $pl = Parallel::Loops->new(99);
     my @returnValues;
@@ -87,21 +87,44 @@ sub patron_barcode_transform {
             push(
                 @returnValues,
                 {
-                    server => $_,
+                    server   => $_,
                     response => $response,
                 }
             );
         }
     );
 
-    my $data;
-    foreach my $d ( @returnValues ) {
+    my $patron_data;
+    foreach my $d (@returnValues) {
         my $r = $d->{response};
         if ( $r->is_success && $r->code eq '200' ) {
-            my $patron = decode_json( $d->{response}->decoded_content );
-            warn "PATRON: " . Data::Dumper::Dumper( $patron );
+            $patron_data = decode_json( $d->{response}->decoded_content );
+            warn "PATRON: " . Data::Dumper::Dumper($patron_data);
+            last;
         }
     }
+
+    my $settings = { map { $_->{name} => $_->{value} } @{ $conf->{setting} } };
+
+    delete $patron_data->{borrowernumber};
+
+    $patron_data->{branchcode} = $settings->{default_branchcode}
+      if $settings->{default_branchcode};
+    $patron_data->{categorycode} = $settings->{default_categorycode}
+      if $settings->{default_categorycode};
+
+    $patron_data->{branchcode} =
+        C4::Context->userenv
+      ? C4::Context->userenv->{'branch'}
+      : $patron_data->{branchcode}
+      if $settings->{use_logged_in_branchcode};
+
+    try {
+        Koha::Patron->new($patron_data)->store();
+    }
+    catch {
+        warn "caught error: $_";    # not $@
+    };
 }
 
 sub install() {
