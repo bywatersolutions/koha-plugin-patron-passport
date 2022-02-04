@@ -78,7 +78,7 @@ sub patron_barcode_transform {
             my $username = $_->{username};
             my $password = $_->{password};
 
-            my $request = GET "$address/api/v1/libraries";
+            my $request = GET "$address/api/v1/contrib/patron_passport/patron/check/$cardnumber";
 
             $request->authorization_basic( $username, $password );
 
