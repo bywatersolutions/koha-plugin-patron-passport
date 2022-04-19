@@ -190,7 +190,7 @@ sub cronjob_nightly {
 sub install {
     my ( $self, $args ) = @_;
 
-    my $attribute_type = Koha::Patron::Attribute::Type->find('PASSPORTED');
+    my $attribute_type = Koha::Patron::Attribute::Types->find('PASSPORTED');
     Koha::Patron::Attribute::Type->new(
         {
             code        => 'PASSPORTED',
