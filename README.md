@@ -6,6 +6,8 @@ to find the server that has that patron, and will copy the patron from it.
 
 ## Installation
 
+This plugin requires the installation of the Perl library Parallel::Loops, which is not included with Koha.
+
 * Enable RESTBasicAuth on all Koha instances
 
 This plugin requires data to be added to koha-conf.xml in the following format:
