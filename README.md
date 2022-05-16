@@ -13,7 +13,7 @@ This plugin requires the installation of the Perl library Parallel::Loops, which
 This plugin requires data to be added to koha-conf.xml in the following format:
 ```xml
  <patron_passport>
-    <setting name="default_category_code" value="PT"/>
+    <setting name="default_categorycode" value="PT"/>
     <setting name="default_branchcode" value="MPL"/>
     <setting name="use_logged_in_branchcode" value="1"/> <!-- has precedence over default branchcode -->
 
