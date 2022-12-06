@@ -126,6 +126,8 @@ sub patron_barcode_transform {
     $patron_data->{categorycode} = $settings->{default_categorycode}
       if $settings->{default_categorycode};
 
+    $patron_data->{flags} = undef; # Don't copy permissions
+
     $patron_data->{branchcode} =
         C4::Context->userenv
       ? C4::Context->userenv->{'branch'}
@@ -215,8 +217,8 @@ sub uninstall {
 sub api_routes {
     my ( $self, $args ) = @_;
 
-    my $spec_str = $self->mbf_read('openapi.yaml');
-    my $spec     = Load($spec_str);
+    my $spec_str = $self->mbf_read('openapi.json');
+    my $spec     = decode_json($spec_str);
 
     return $spec;
 }
