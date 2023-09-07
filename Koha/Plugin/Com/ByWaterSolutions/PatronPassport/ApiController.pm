@@ -49,7 +49,7 @@ sub check {
 
         return $c->render(
             status  => 200,
-            openapi => $c->objects->to_api($patron),
+            openapi => $patron->unblessed,
         );
     } catch {
         $c->unhandled_exception($_);
