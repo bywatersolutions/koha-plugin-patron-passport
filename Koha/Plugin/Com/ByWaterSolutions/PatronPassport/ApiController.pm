@@ -24,37 +24,34 @@ use Koha::Patrons;
 
 sub check {
     my $c = shift->openapi->valid_input or return;
-    warn "CHECK";
 
-    my $cardnumber = $c->validation->param('cardnumber');
+    my $cardnumber = $c->param('cardnumber');
 
     return try {
-        my $patron =
-          Koha::Patrons->search( { cardnumber => $cardnumber } )->single;
 
-        my $attr =
-          $patron->extended_attributes->search( { code => 'PASSPORTED' } )->single;
+        my $patron = $c->objects->find_rs( Koha::Patrons->new, { cardnumber => $cardnumber } );
 
-        if ( $attr && $attr->attribute ) { ## This patron is a clone and should not be returned
+        unless ($patron) {
             return $c->render(
                 status  => 404,
-                openapi => { error => "Patron not found." }
+                openapi => { error => 'Patron not found' }
             );
         }
 
-        if ( $patron ) {
+        my $attr = $patron->extended_attributes->search( { code => 'PASSPORTED' } )->single;
+
+        if ( $attr && $attr->attribute ) {    ## This patron is a clone and should not be returned
             return $c->render(
-                status  => 200,
-                openapi => $patron->unblessed,
+                status  => 404,
+                openapi => { error => "Patron not found" }
             );
         }
 
         return $c->render(
-            status  => 404,
-            openapi => { error => "Patron not found." }
+            status  => 200,
+            openapi => $c->objects->to_api($patron),
         );
-    }
-    catch {
+    } catch {
         $c->unhandled_exception($_);
     };
 }
