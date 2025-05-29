@@ -16,6 +16,7 @@ This plugin requires data to be added to koha-conf.xml in the following format:
     <setting name="default_categorycode" value="PT"/>
     <setting name="default_branchcode" value="MPL"/>
     <setting name="use_logged_in_branchcode" value="1"/> <!-- has precedence over default branchcode -->
+    <setting name="allow_updates" value="0"/>
 
     <servers>
         <server name="ServerB" address="https://libB.libraries.org" username="koha" password="koha" />
