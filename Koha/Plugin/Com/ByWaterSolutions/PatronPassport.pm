@@ -29,7 +29,7 @@ our $metadata = {
     name            => 'Patron Passport',
     author          => 'Kyle M Hall, ByWater Solutions',
     date_authored   => '2021-02-03',
-    date_updated    => "1900-01-01",
+    date_updated    => "2025-05-29",
     minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
@@ -147,8 +147,16 @@ sub cronjob_nightly {
     my ( $self ) = @_;
 
     my $conf    = C4::Context->config('patron_passport');
-    my $servers = { map { $_->{name} => $_ } @{ $conf->{servers}->{server}  } };
     my $settings = { map { $_->{name} => $_->{value} } @{ $conf->{setting} } };
+
+    # Check allow_updates setting
+
+    unless ( $settings->{allow_updates} && $settings->{allow_updates} eq '1' ) {
+        warn "PatronPassport: Nightly update skipped — allow_updates is disabled.";
+        return;
+    }
+    
+    my $servers = { map { $_->{name} => $_ } @{ $conf->{servers}->{server}  } };
 
     my $attrs = Koha::Patron::Attributes->search({ code => 'PASSPORTED' }); 
     while ( my $a = $attrs->next ) {
