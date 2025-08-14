@@ -22,8 +22,8 @@ use Koha::Patrons;
 use Koha::Patron::Attribute::Types;
 use Koha::Patron::Attributes;
 
-our $VERSION         = "{VERSION}";
-our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
+our $VERSION         = "1.0.7";
+our $MINIMUM_VERSION = "24.11";
 
 our $metadata = {
     name            => 'Patron Passport',
@@ -152,7 +152,7 @@ sub cronjob_nightly {
     # Check allow_updates setting
 
     unless ( $settings->{allow_updates} && $settings->{allow_updates} eq '1' ) {
-        warn "PatronPassport: Nightly update skipped — allow_updates is disabled.";
+        warn "PatronPassport: Nightly update skipped -- allow_updates is disabled.";
         return;
     }
     
