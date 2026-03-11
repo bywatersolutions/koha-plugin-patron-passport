@@ -29,7 +29,14 @@ sub check {
 
     return try {
 
-        my $patron = $c->objects->find_rs( Koha::Patrons->new, { cardnumber => $cardnumber } );
+        my $patron = Koha::Patrons->search(
+                {
+                -or => [
+                cardnumber => $cardnumber,
+                userid     => $cardnumber,
+                ]
+            }
+            )->single;
 
         unless ($patron) {
             return $c->render(

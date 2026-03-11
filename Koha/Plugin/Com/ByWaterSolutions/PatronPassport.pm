@@ -23,13 +23,13 @@ use Koha::Patron::Attribute::Types;
 use Koha::Patron::Attributes;
 
 our $VERSION         = "1.0.7";
-our $MINIMUM_VERSION = "24.11";
+our $MINIMUM_VERSION = "25.05";
 
 our $metadata = {
     name            => 'Patron Passport',
     author          => 'Kyle M Hall, ByWater Solutions',
     date_authored   => '2021-02-03',
-    date_updated    => "2025-05-29",
+    date_updated    => "2026-03-11",
     minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
@@ -117,6 +117,27 @@ sub patron_barcode_transform {
         }
     }
 
+    unless ( $patron_data && $server ) {
+        warn "PatronPassport: no remote match found for '$cardnumber'; skipping local patron creation";
+        return;
+    }
+
+    unless ( ref($patron_data) eq 'HASH' ) {
+        warn "PatronPassport: invalid remote response for '$cardnumber'; skipping local patron creation";
+        return;
+    }
+
+    # Require at least some real patron identity before creating a local record
+
+    unless (
+        ( defined $patron_data->{surname}    && $patron_data->{surname} ne '' )
+        || ( defined $patron_data->{cardnumber} && $patron_data->{cardnumber} ne '' )
+        || ( defined $patron_data->{userid}      && $patron_data->{userid} ne '' )
+    ) {
+        warn "PatronPassport: incomplete remote patron data for '$cardnumber'; skipping local patron creation";
+        return;
+    }
+
     my $settings = { map { $_->{name} => $_->{value} } @{ $conf->{setting} } };
 
     delete $patron_data->{borrowernumber};
@@ -175,6 +196,7 @@ sub cronjob_nightly {
         my $password = $server->{password};
 
         my $cardnumber = $patron->cardnumber;
+        next unless defined $cardnumber && $cardnumber ne '';
 
         my $request;
         my $url = "$address/api/v1/contrib/patron_passport/patron/check/$cardnumber";
