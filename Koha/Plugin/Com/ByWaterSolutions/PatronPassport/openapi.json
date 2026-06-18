@@ -37,7 +37,7 @@
             },
             "x-koha-authorization": {
                 "permissions": {
-                    "borrowers": "1"
+                    "borrowers": "list_borrowers"
                 }
             }
         }
