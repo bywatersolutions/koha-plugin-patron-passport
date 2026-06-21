@@ -32,3 +32,5 @@ It is important that all the possible branchcodes and category codes be set up i
 unless you are using the settings to replace the external codes with your own internal ones.
 Any attept to import a patron with a branchcode or category code that is not valid in your Koha
 instance will fail.
+
+The user specified in the server config must be granted borrowers: list_borrowers permission
