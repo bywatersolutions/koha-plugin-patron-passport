@@ -18,6 +18,7 @@ use Try::Tiny;
 
 use C4::Auth;
 use C4::Context;
+use C4::Members::Messaging;
 use Koha::Patrons;
 use Koha::Patron::Attribute::Types;
 use Koha::Patron::Attributes;
@@ -157,6 +158,10 @@ sub patron_barcode_transform {
 
     try {
         my $patron = Koha::Patron->new($patron_data)->store();
+	C4::Members::Messaging::SetMessagingPreferencesFromDefaults({
+	    borrowernumber => $patron->borrowernumber,
+	    categorycode   => $patron->categorycode
+	});
         $patron->add_extended_attribute({ code => 'PASSPORTED', attribute => $server->{name} });
     }
     catch {
