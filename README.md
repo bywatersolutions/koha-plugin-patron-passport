@@ -18,6 +18,10 @@ This plugin requires data to be added to koha-conf.xml in the following format:
     <setting name="use_logged_in_branchcode" value="1"/> <!-- has precedence over default branchcode -->
     <setting name="allow_updates" value="0"/>
 
+    <set_field name="dateenrolled" value="delete"/>
+    <set_field name="dateexpiry" value="delete"/>
+    <set_field name="sort1" value="imported"/>
+
     <servers>
         <server name="ServerB" address="https://libB.libraries.org" username="koha" password="koha" />
         <server name="ServerC" address="https://libC.libraries.org" username="koha" password="koha" />
@@ -25,6 +29,8 @@ This plugin requires data to be added to koha-conf.xml in the following format:
  </patron_passport>
 ```
 this must be inside the `config` block of the koha conf.
+
+The 'set_field' directives are optional and can be used to delete fields with the value 'delete' or set them to a custom string
 
 ## Setup
 
