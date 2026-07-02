@@ -166,7 +166,21 @@ sub patron_barcode_transform {
       if $settings->{use_logged_in_branchcode};
 
     try {
-        my $patron = Koha::Patron->new($patron_data)->store();
+	my $patron;
+        if( $settings->{preserve_debarments} ){
+            $patron = Koha::Patron->new($patron_data)->store();
+	    my $debarment = Koha::Patron::Debarments::AddDebarment({
+	        borrowernumber => $patron->borrowernumber,
+	        type => 'PASSPORTED',
+	        expiration => $patron->debarred,
+	        comment    => $patron->debarredcomment,
+	     });
+        } else {
+	    delete $patron_data->{debarred};
+	    delete $patron_data->{debarredcomment};
+            $patron = Koha::Patron->new($patron_data)->store();
+        }
+
 	C4::Members::Messaging::SetMessagingPreferencesFromDefaults({
 	    borrowernumber => $patron->borrowernumber,
 	    categorycode   => $patron->categorycode
@@ -192,6 +206,7 @@ sub cronjob_nightly {
     }
     
     my $servers = { map { $_->{name} => $_ } @{ $conf->{servers}->{server}  } };
+    my $set_fields = { map { $_->{name} => $_->{value} } @{ $conf->{set_field} } };
 
     my $attrs = Koha::Patron::Attributes->search({ code => 'PASSPORTED' }); 
     while ( my $a = $attrs->next ) {
@@ -231,6 +246,16 @@ sub cronjob_nightly {
         delete $patron_data->{categorycode};
         delete $patron_data->{flags};
         delete $patron_data->{dateenrolled};
+
+        # We should preserve the field settings in the config
+        foreach my $field (keys %{$set_fields}) {
+            if( $set_fields->{$field} eq 'delete'){
+                delete $patron_data->{$field};
+            } else {
+                $patron_data->{$field} = $set_fields->{$field};
+            }
+        }
+
         $patron->update($patron_data);
     }
 }
@@ -247,11 +272,36 @@ sub install {
     )->store()
       unless $attribute_type;
 
+    my $restriction_type = Koha::Patron::Restriction::Types->find('PASSPORTED');
+    Koha::Patron::Restriction::Type->new(
+        {
+            code               => 'PASSPORTED',
+            display_text       => 'Restriction from passported server',
+	    is_system          => 1,
+	    is_default         => 0,
+	    lift_after_payment => 0,
+        }
+    )->store()
+      unless $restriction_type;
+
     return 1;
 }
 
 sub upgrade {
     my ( $self, $args ) = @_;
+
+    my $restriction_type = Koha::Patron::Restriction::Types->find('PASSPORTED');
+    Koha::Patron::Restriction::Type->new(
+        {
+            code               => 'PASSPORTED',
+            display_text       => 'Restriction from passported server',
+	    is_system          => 1,
+	    is_default         => 0,
+	    lift_after_payment => 0,
+        }
+    )->store()
+      unless $restriction_type;
+
     return 1;
 }
 
