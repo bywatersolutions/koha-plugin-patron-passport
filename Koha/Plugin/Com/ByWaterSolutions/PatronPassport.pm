@@ -167,7 +167,7 @@ sub patron_barcode_transform {
 
     try {
 	my $patron;
-        if( $settings->{preserve_debarments} ){
+        if( defined $patron_data->{debarred} && $patron_data->{debarred} && $settings->{preserve_debarments} ){
             $patron = Koha::Patron->new($patron_data)->store();
 	    my $debarment = Koha::Patron::Debarments::AddDebarment({
 	        borrowernumber => $patron->borrowernumber,
@@ -246,6 +246,23 @@ sub cronjob_nightly {
         delete $patron_data->{categorycode};
         delete $patron_data->{flags};
         delete $patron_data->{dateenrolled};
+
+
+	# We only create a debarment if one is passed, we are set to preserve, and patron does not have an existing debarment
+	# the auto increment is the only unique key - so we cannot reliably tell if the incoming one exists, we could match date
+	# and comment, but we don't get the type, I think if one exists, that is sufficient
+	# We also won't remove a debarment locally if removed remotely, needs to be cleared manually
+        if( defined $patron_data->{debarred} && $patron_data->{debarred} && $settings->{preserve_debarments} && $patron->restrictions->count == 0 ){
+	    my $debarment = Koha::Patron::Debarments::AddDebarment({
+	        borrowernumber => $patron->borrowernumber,
+	        type => 'PASSPORTED',
+	        expiration => $patron_data->{debarred},
+	        comment    => $patron_data->{debarredcomment},
+	     });
+        } else {
+	    delete $patron_data->{debarred};
+	    delete $patron_data->{debarredcomment};
+        }
 
         # We should preserve the field settings in the config
         foreach my $field (keys %{$set_fields}) {
