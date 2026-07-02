@@ -18,6 +18,7 @@ use Try::Tiny;
 
 use C4::Auth;
 use C4::Context;
+use C4::Members::Messaging;
 use Koha::Patrons;
 use Koha::Patron::Attribute::Types;
 use Koha::Patron::Attributes;
@@ -139,8 +140,17 @@ sub patron_barcode_transform {
     }
 
     my $settings = { map { $_->{name} => $_->{value} } @{ $conf->{setting} } };
+    my $set_fields = { map { $_->{name} => $_->{value} } @{ $conf->{set_field} } };
 
+    # We do not want to assume the borrowernumber or grant permissions
     delete $patron_data->{borrowernumber};
+    foreach my $field (keys %{$set_fields}) {
+	if( $set_fields->{$field} eq 'delete'){
+            delete $patron_data->{$field};
+        } else {
+            $patron_data->{$field} = $set_fields->{$field};
+        }
+    }
 
     $patron_data->{branchcode} = $settings->{default_branchcode}
       if $settings->{default_branchcode};
@@ -157,6 +167,10 @@ sub patron_barcode_transform {
 
     try {
         my $patron = Koha::Patron->new($patron_data)->store();
+	C4::Members::Messaging::SetMessagingPreferencesFromDefaults({
+	    borrowernumber => $patron->borrowernumber,
+	    categorycode   => $patron->categorycode
+	});
         $patron->add_extended_attribute({ code => 'PASSPORTED', attribute => $server->{name} });
     }
     catch {
@@ -215,6 +229,8 @@ sub cronjob_nightly {
         my $patron_data = decode_json( $response->decoded_content );
         delete $patron_data->{borrowernumber};
         delete $patron_data->{categorycode};
+        delete $patron_data->{flags};
+        delete $patron_data->{dateenrolled};
         $patron->update($patron_data);
     }
 }
