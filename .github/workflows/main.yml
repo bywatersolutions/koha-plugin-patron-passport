@@ -69,6 +69,16 @@ jobs:
         export KTD_HOME=$(pwd)
         ktd --name patron-passport --wait-ready 240
 
+    - name: Install Parallel::Loops
+      run: |
+        export KTD_HOME=$(pwd)/../koha-testing-docker
+        until ktd --name patron-passport --shell --run \
+          "sudo cpanm --notest Parallel::Loops"
+        do
+          echo "Parallel::Loops installation failed; retrying..."
+          sleep 5
+        done
+
     - name: Install plugins in KTD (fresh install)
       run: |
         export KTD_HOME=$(pwd)/../koha-testing-docker
