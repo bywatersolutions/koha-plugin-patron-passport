@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This file is part of Koha.
 #
@@ -18,34 +18,26 @@
 use Modern::Perl;
 
 use Test::More;
-use File::Spec;
 use File::Find;
-
-=head1 DESCRIPTION
-
-=cut
-
-my $lib = '/var/lib/koha/kohadev/plugins'; # Could be changed to $Bin/..
-
-unshift( @INC, $lib );
-unshift( @INC, '/kohadevbox/koha/' );
-unshift( @INC, '/kohadevbox/koha/misc/translator/' );
-unshift( @INC, '/kohadevbox/koha/t/lib/' );
 
 find(
     {
-        bydepth  => 1,
-        no_chdir => 1,
-        wanted   => sub {
+        bydepth    => 1,
+        no_chdir   => 1,
+        preprocess => sub { grep { $_ !~ /^\./ } @_ },
+        wanted     => sub {
             my $m = $_;
             return unless $m =~ s/[.]pm$//;
-            $m =~ s{^.*/Koha/}{Koha/};
+
+            return unless $m =~ s{^.*/Koha/}{Koha/};
+
             $m =~ s{/}{::}g;
-            use_ok($m) || BAIL_OUT("***** PROBLEMS LOADING FILE '$m'");
+
+            use_ok($m)
+                || BAIL_OUT("***** PROBLEMS LOADING FILE '$m'");
         },
     },
-    $lib
+    '.'
 );
 
 done_testing();
-
