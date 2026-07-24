@@ -91,6 +91,13 @@ jobs:
           cd /kohadevbox/plugins/${{ env.GITHUB_REPO }} &&
           export PERL5LIB=\$PERL5LIB:. &&
           sudo cpanm --notest TAP::Harness::JUnit &&
+          echo '=== Verify Parallel::Loops ===' &&
+          perl -MParallel::Loops -e 'print qq{Parallel::Loops loaded successfully\n}' &&
+          echo '=== Show load test ===' &&
+          cat t/00-load.t &&
+          echo '=== Run load test directly ===' &&
+          perl t/00-load.t &&
+          echo '=== Run full test suite ===' &&
           JUNIT_OUTPUT_FILE=junit_fresh.xml prove -v -r -s t/ --harness=TAP::Harness::JUnit
         "
 
