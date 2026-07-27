@@ -211,9 +211,12 @@ jobs:
     - name: Build Koha Plugin kpz artifact
       if: steps.check-branch.outputs.on_main == 'true'
       id: kpz
-      run: |
-        docker run -v ${PWD}:/plugin registry.gitlab.com/thekesolutions/tools/koha-plugin-builder
-        echo "filename=$(ls *.kpz)" >> $GITHUB_OUTPUT
+      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
+      with:
+        release-version: ${{ steps.myvars.outputs.tag_version }}
+        release-name: ${{ steps.myvars.outputs.github_repo }}
+        minimum-version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}
+        plugin-module: "Koha/Plugin/Com/ByWaterSolutions/PatronPassport.pm"
 
     - name: See if kpz was created
       if: steps.check-branch.outputs.on_main == 'true'
