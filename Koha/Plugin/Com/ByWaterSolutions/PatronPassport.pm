@@ -23,7 +23,7 @@ use Koha::Patrons;
 use Koha::Patron::Attribute::Types;
 use Koha::Patron::Attributes;
 
-our $VERSION         = "1.0.7";
+our $VERSION         = "1.1.5";
 our $MINIMUM_VERSION = "25.05";
 
 our $metadata = {
