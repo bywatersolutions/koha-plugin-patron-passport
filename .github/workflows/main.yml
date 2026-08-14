@@ -220,7 +220,7 @@ jobs:
     - name: Build Koha Plugin kpz artifact
       if: steps.check-branch.outputs.on_main == 'true'
       id: kpz
-      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@v3"
+      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
       with:
         release-version: ${{ steps.myvars.outputs.tag_version }}
         release-name: ${{ steps.myvars.outputs.github_repo }}
